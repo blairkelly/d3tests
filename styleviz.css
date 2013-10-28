@@ -1,0 +1,40 @@
+body {
+	background-color: #444;
+	color: #FFF;
+	font-family: "Helvetica Neue";
+}
+
+
+
+
+
+/*LINE CHART*/
+
+/* tell the SVG path to be a thin blue line without any area fill */
+svg {background: #FAFAFA;}
+.agraph path {
+	stroke: steelblue;
+	stroke-width: 1;
+	fill: none;
+}
+
+.agraph .axis {
+  shape-rendering: crispEdges;
+}
+
+.agraph .x.axis line {
+  stroke: lightgrey;
+}
+
+.agraph .x.axis .minor {
+  stroke-opacity: .5;
+}
+
+.agraph .x.axis path {
+  display: none;
+}
+
+.agraph .y.axis line, .y.axis path {
+  fill: none;
+  stroke: #000;
+}
