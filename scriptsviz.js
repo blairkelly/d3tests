@@ -19,7 +19,7 @@ d3.select("body").append("svg")
     //.call(axis);*/
 
 
-var thedata = [[1,2,3,4,5,6,7,8,9,10],[1,3,20,4,5,16,7,8,9,40], [50,5,10,14,2,-20,9,0,15,20,0]];
+var thedata = [[1,2,3,4,5,6,7,8,9,10],[1,3,20,4,5,16,7,8,9,40], [50,5,10,14,2,-20,9,0,15,20]];
 
 // define dimensions of graph
 var m = [40, 40, 60, 80]; // margins
@@ -33,14 +33,14 @@ console.log("w: " + w)
 var x = d3.scale.linear().domain([1, (thedata[0].length - 0)]).range([0, w]);
 
 var aomm = new Array(); //array of mins and maxs
-for(var n=1; n<thedata.length; n++) {
+for(var n=2; n<thedata.length; n++) {
 	aomm.push(d3.min(thedata[n]));
 	aomm.push(d3.max(thedata[n]));
 }
 var minimum = d3.min(aomm);
 var maximum = d3.max(aomm);
-
 console.log(minimum + " - " + maximum);
+
 // Y scale will fit values from 0-10 within pixels h-0 (Note the inverted domain for the y-scale: bigger is up!)
 var y = d3.scale.linear().domain([minimum, maximum]).range([h, 0]);
 	// automatically determining max range can work something like this
@@ -48,7 +48,7 @@ var y = d3.scale.linear().domain([minimum, maximum]).range([h, 0]);
 
 // create a line function that can convert data[] into x and y points
 var line = d3.svg.line()
-	.interpolate("cardinal")
+	.interpolate("linear")
 	// assign the X function to plot our line as we wish
 	.x(function(d,i) {
 		i+=1;
@@ -81,12 +81,12 @@ graph.append("svg:g")
 
 
 // create left yAxis
-var yAxisLeft = d3.svg.axis().scale(y).ticks(8).orient("left");
+var yAxisLeft = d3.svg.axis().scale(y).ticks(10).orient("left");
 // Add the y-axis to the left
-graph.append("svg:g")
-      .attr("class", "y axis")
-      .attr("transform", "translate(-25,0)")
-      .call(yAxisLeft);
+var callagain = graph.append("svg:g")
+      			.attr("class", "y axis")
+      			.attr("transform", "translate(-25,0)")
+      			.call(yAxisLeft);
 	
 
 /*setTimeout(function () {
@@ -95,9 +95,9 @@ graph.append("svg:g")
 }, 100);*/
 
 setTimeout(function () {
-	g1 = graph.append("svg:path").style('stroke', '#ff7f0e').style('stroke-width', '1.5').attr("d", line(thedata[1]));
+	//g1 = graph.append("svg:path").style('stroke', '#ff7f0e').style('stroke-width', '1.5').attr("d", line(thedata[1]));
 	g2 = graph.append("svg:path").style('stroke', '#2ca02c').style('stroke-width', '1.5').attr("d", line(thedata[2]));
-}, 125);
+}, 3);
 
 var doflip = function (a, b) {
 	setTimeout(function () {
@@ -122,20 +122,53 @@ function redrawWithAnimation() {
 		/* thanks to 'barrym' for examples of transform: https://gist.github.com/1137131 */
 }
 
-setTimeout(function () {
-	thedata[2].push(50);
-	console.log(thedata[2]);
-	//g2.transition().duration(2500).attr("d", line(thedata[2]));
-	g2.data([thedata[2]])
-	.attr("transform", "translate(" + x(1) + ")")
-	.attr("d", line)
-	.transition()
-	.ease("linear")
-	.duration(500)
-	.attr("transform", "translate(" + x(0) + ")")
-	.each("end", function() {
+var testtransform1 = function () {
+	setTimeout(function () {
+		thedata[2].push(50);
+		console.log(thedata[2]);
+		//g2.transition().duration(2500).attr("d", line(thedata[2]));
+		g2.data([thedata[2]])
+		.attr("transform", "translate(" + x(1) + ")")
+		.attr("d", line)
+		.transition()
+		.ease("linear")
+		.duration(500)
+		.attr("transform", "translate(" + x(0) + ")")
+		.each("end", function() {
+			thedata[2].shift();
+			console.log(thedata[2])
+		});
+	}, 1500);
+}
+
+setInterval(function () {
+		var rn = Math.floor(Math.random() * 101) - 50;
 		thedata[2].shift();
-		console.log(thedata[2])
-	});
-}, 1500);
+		thedata[2].push(rn);
+		var newmin = d3.min(thedata[2]);
+	    var newmax = d3.max(thedata[2]);
+	    if(newmin < minimum) {
+	    	minimum = newmin;
+	    	console.log(minimum + " - " + maximum);
+	    }
+	    if(newmax > maximum) {
+	    	maximum = newmax;
+	    	console.log(minimum + " - " + maximum);
+	    }
+	    y = d3.scale.linear().domain([minimum, maximum]).range([h, 0]);
+	    yAxisLeft = d3.svg.axis().scale(y).ticks(10).orient("left");
+	    callagain.call(yAxisLeft);
+	    //graph.call(yAxisLeft);
+		//yAxisLeft = d3.svg.axis().scale(y).ticks(8).orient("left");
+		var start = thedata[2].length - 10;
+		var end = thedata[2].length;
+		var na = thedata[2].slice(start, end);
+		g2.attr("d", line(na));
+}, 30);
+
+
+
+
+
+
 
